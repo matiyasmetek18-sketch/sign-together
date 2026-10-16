@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sign Together</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #07131f;
+        --card: #10283b;
+        --text: #f7fbff;
+        --muted: #b7c7d6;
+        --accent: #ffb703;
+        --ink: #1a1203;
+        --good: #2ec4b6;
+        --bad: #ff6b6b;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Avenir Next", "Segoe UI", sans-serif;
+        background: radial-gradient(circle at top, #14324d, var(--bg) 55%);
+        color: var(--text);
+      }
+      main {
+        max-width: 560px;
+        margin: 0 auto;
+        padding: 28px 20px 48px;
+      }
+      h1 { font-size: 40px; line-height: 1; margin: 8px 0 12px; }
+      p { color: var(--muted); line-height: 1.45; }
+      .card {
+        background: var(--card);
+        border-radius: 20px;
+        padding: 18px;
+        margin-top: 16px;
+      }
+      label { display: block; font-weight: 700; margin-bottom: 8px; }
+      input {
+        width: 100%;
+        border: 0;
+        border-radius: 14px;
+        padding: 16px;
+        font-size: 28px;
+        letter-spacing: 0.28em;
+        text-transform: uppercase;
+        background: #07131f;
+        color: var(--text);
+      }
+      button {
+        width: 100%;
+        margin-top: 12px;
+        border: 0;
+        border-radius: 14px;
+        padding: 16px;
+        font-size: 20px;
+        font-weight: 700;
+        background: var(--accent);
+        color: var(--ink);
+      }
+      button.secondary { background: transparent; color: var(--text); border: 2px solid #1e4663; }
+      video {
+        width: 100%;
+        border-radius: 16px;
+        background: #000;
+        aspect-ratio: 3 / 4;
+        object-fit: cover;
+      }
+      .letter {
+        font-size: 96px;
+        line-height: 1;
+        margin: 8px 0;
+        font-weight: 800;
+      }
+      .status { font-size: 18px; }
+      .good { color: var(--good); }
+      .bad { color: var(--bad); }
+      .letters { display: flex; gap: 8px; }
+      .letters span {
+        flex: 1;
+        text-align: center;
+        background: #07131f;
+        border-radius: 12px;
+        padding: 10px 0;
+        font-weight: 800;
+      }
+      details { margin-top: 18px; color: var(--muted); }
+      .test-row { display: flex; gap: 8px; }
+      .test-row button { margin-top: 8px; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p>Companion for the Fire TV game</p>
+      <h1>Sign Together</h1>
+      <p>
+        Enter the code from the television. This page reads your hand on the phone.
+        Only the guessed letter is sent — never the camera image.
+      </p>
+      <section class="card">
+        <label for="code">Pairing code</label>
+        <input id="code" maxlength="6" autocapitalize="characters" autocomplete="off" />
+        <button id="join" type="button">Join the TV</button>
+        <p id="status" class="status">Waiting for a code.</p>
+      </section>
+      <section class="card">
+        <video id="camera" autoplay playsinline muted></video>
+        <div id="seen" class="letter">–</div>
+        <p id="detail">Show a steady ASL handshape for A, B, L, V, or Y.</p>
+      </section>
+      <div class="letters" aria-label="Supported letters">
+        <span>A</span><span>B</span><span>L</span><span>V</span><span>Y</span>
+      </div>
+      <details>
+        <summary>No camera? Send a test letter</summary>
+        <p>These buttons skip hand detection and are only for desktop checks.</p>
+        <div class="test-row">
+          <button class="secondary" type="button" data-test-letter="A">A</button>
+          <button class="secondary" type="button" data-test-letter="B">B</button>
+          <button class="secondary" type="button" data-test-letter="L">L</button>
+          <button class="secondary" type="button" data-test-letter="V">V</button>
+          <button class="secondary" type="button" data-test-letter="Y">Y</button>
+        </div>
+      </details>
+    </main>
+    <script type="module" src="/phone/app.js"></script>
+  </body>
+</html>
