@@ -59,7 +59,7 @@ The CLI created an instance and printed `Waiting for virtual device to boot`. Af
 | Physical camera / MediaPipe on a phone | Not run |
 | Measured recognition accuracy | None. Do not invent one. |
 | AWS deployment | Not deployed |
-| Git push | Blocked. GitHub token is invalid. |
+| Git push | Pushed to `origin/main` on `matiyasmetek18-sketch/sign-together`. |
 
 ## Recognition settings
 

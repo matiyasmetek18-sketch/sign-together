@@ -2,7 +2,7 @@
 
 ## GitHub
 
-The workspace had the Vega starter and no commits. `gh auth status` reports that the keyring token for `matiyasmetek18-sketch` is invalid. Unauthenticated requests to `https://github.com/matiyasmetek18-sketch/sign-together` return 404, so the private repository could not be confirmed from this session.
+The workspace had the Vega starter and no commits. `gh` still has an invalid keyring token, so `gh` API calls fail. Git's credential helper could fetch and push. The remote's only prior commit was a one-line README, which was merged without a force-push.
 
 ## Vega CLI
 
