@@ -12,5 +12,6 @@ infra/dist
 *.vpkg
 buildinfo.json
 generated/
+sign-together-review.zip
 CMakeUserPresets.json
 npm-debug.log

@@ -35,9 +35,12 @@ Requirements: Node.js 20+, the Vega SDK for the TV app, and a phone or desktop b
 ```sh
 npm install
 npm run relay
+npm run tv
 ```
 
-Open http://127.0.0.1:8787 on the phone. On the TV app, choose **Start practice** and enter the code shown on the television.
+`npm run relay` prints an http address for this Mac and one for every local network address. Open that page on the phone and enter the code printed by `npm run tv`.
+
+`npm run tv` is a terminal stand-in that uses the same scoring code as the Fire TV app. The Vega package is still the television app. The virtual device did not boot on this Mac, so the terminal is the way to play a live round until a Fire TV or a working simulator is available.
 
 The Vega simulator does not use the Mac's `127.0.0.1`. If the TV cannot reach the relay, set `LOCAL_RELAY_URL` in `src/config.ts` to `ws://<mac-lan-ip>:8787` and open the phone page at `http://<mac-lan-ip>:8787`.
 

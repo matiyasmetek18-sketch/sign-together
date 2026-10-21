@@ -48,7 +48,15 @@ Command: `vega virtual-device start --timeout 180`
 
 The CLI created an instance and printed `Waiting for virtual device to boot`. After 180 seconds it reported `Deadline reached (180s) but virtual device unresponsive` and exited 0. A follow-up `vega virtual-device status` returned `{"running":false}`.
 
-`vvd/virtual_device.log` records `virtual device failed to boot` with `failed to access shell`. The app package was not installed, and D-pad navigation was not exercised.
+`vvd/virtual_device.log` records `virtual device failed to boot` with `failed to access shell`. The instance `virtual_device.err` log shows QEMU threads hanging for 15 seconds and then a crash. Checked again on October 21: `vega virtual-device status` returned `running: false`, and `vega device list` found no device. The app package was not installed, and D-pad navigation was not exercised.
+
+## Terminal round
+
+Command on October 21: `node --experimental-strip-types --test shared/*.test.mjs relay/server.test.mjs infra/lambda/router.test.mjs scripts/tv-round.test.mjs`
+
+Result: **18 passed, 0 failed.**
+
+`scripts/tv-round.test.mjs` starts the local relay, joins a phone, and scores with `src/game/reducer.ts`. A matching A advances the terminal to B and sets the score to 1. The same event id is rejected. A new event id that repeats A does not raise the score, because the target is already B.
 
 ## Not verified
 

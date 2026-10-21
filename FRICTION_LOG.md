@@ -10,7 +10,7 @@ The workspace had the Vega starter and no commits. `gh` still has an invalid key
 
 The first debug build stalled in Metro on `Waiting for Watchman watch-project` past 90 seconds. `metro.config.js` sets `resolver.useWatchman` to false so the bundler uses the Node watcher instead.
 
-`vega virtual-device start --timeout 180` created an instance, then logged `virtual device failed to boot` / `failed to access shell`. Status after the deadline was `running: false`, so the package was not launched and remote focus was not tested.
+`vega virtual-device start --timeout 180` created an instance, then logged `virtual device failed to boot` / `failed to access shell`. The instance error log shows the QEMU main loop and CPU threads hanging for 15 seconds, Vulkan texture validation failures, and a crash under Rosetta (`UniversalExceptionRaise`). On October 21 the virtual device was not running and `vega device list` found no hardware. The package was not launched.
 
 `BackHandler` is a lazy getter on the Kepler React Native export. A named import is undefined under Jest, so the TV app reads `ReactNative.BackHandler` and skips the listener when the test double does not provide it.
 

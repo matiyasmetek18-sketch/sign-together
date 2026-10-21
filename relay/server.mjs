@@ -1,5 +1,6 @@
 import http from 'node:http';
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {WebSocketServer} from 'ws';
@@ -64,10 +65,12 @@ export async function startRelay(options = {}) {
 
   const address = server.address();
   const boundPort = typeof address === 'object' && address ? address.port : port;
+  const pages = hostPages(boundPort);
   return {
     port: boundPort,
     url: `ws://127.0.0.1:${boundPort}`,
     page: `http://127.0.0.1:${boundPort}/`,
+    pages,
     close: () =>
       new Promise((resolve, reject) => {
         wss.close();
@@ -152,8 +155,29 @@ function serveStatic(request, response) {
 }
 
 const isDirectRun = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+export function hostPages(port) {
+  const hosts = new Set(['127.0.0.1']);
+  let interfaces = {};
+  try {
+    interfaces = os.networkInterfaces();
+  } catch {
+    interfaces = {};
+  }
+  for (const entries of Object.values(interfaces)) {
+    for (const entry of entries ?? []) {
+      if (entry.family === 'IPv4' && !entry.internal) {
+        hosts.add(entry.address);
+      }
+    }
+  }
+  return [...hosts].map((host) => ({
+    page: `http://${host}:${port}/`,
+    socket: `ws://${host}:${port}`,
+  }));
+}
+
 if (isDirectRun) {
   startRelay().then((relay) => {
-    console.log(JSON.stringify({service: 'local-relay', event: 'listening', page: relay.page, socket: relay.url}));
+    console.log(JSON.stringify({service: 'local-relay', event: 'listening', pages: relay.pages}));
   });
 }

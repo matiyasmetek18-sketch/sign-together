@@ -22,8 +22,9 @@ export const PairingScreen = ({code, status, onRetry, onCancel}: PairingScreenPr
         {status}
       </Text>
       <Text style={screenStyles.body}>
-        On a phone, open {PHONE_PAGE_URL} and enter this code. The code expires
-        in 10 minutes and can be used once.
+        On a phone, open the http address printed by npm run relay. This computer
+        is {PHONE_PAGE_URL}. Enter this code. It expires in 10 minutes and works
+        once.
       </Text>
       <Text style={styles.steps}>
         1. Open the companion page.{'\n'}
