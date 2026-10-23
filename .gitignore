@@ -13,5 +13,6 @@ infra/dist
 buildinfo.json
 generated/
 sign-together-review.zip
+relay/dev-certs/
 CMakeUserPresets.json
 npm-debug.log

@@ -1,4 +1,5 @@
 import http from 'node:http';
+import https from 'node:https';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -6,6 +7,7 @@ import {fileURLToPath} from 'node:url';
 import {WebSocketServer} from 'ws';
 import {parseClientMessage, MAX_MESSAGE_BYTES} from '../shared/protocol.mjs';
 import {createMemoryStore, createSessionService, dispatchClientMessage} from '../shared/session.mjs';
+import {ensureDevCertificate} from './devcert.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const RATE_LIMIT = 8;
@@ -15,7 +17,14 @@ export async function startRelay(options = {}) {
   const service = options.service ?? createSessionService({store: createMemoryStore(), now: options.now});
   const sockets = new Map();
   const server = http.createServer(serveStatic);
-  const wss = new WebSocketServer({server, maxPayload: MAX_MESSAGE_BYTES});
+  const wss = new WebSocketServer({noServer: true, maxPayload: MAX_MESSAGE_BYTES});
+  const acceptUpgrade = (request, socket, head) => {
+    wss.handleUpgrade(request, socket, head, (ws) => {
+      wss.emit('connection', ws, request);
+    });
+  };
+  server.on('upgrade', acceptUpgrade);
+  let httpsServer = null;
 
   wss.on('connection', (socket) => {
     const connectionId = crypto.randomUUID();
@@ -59,24 +68,52 @@ export async function startRelay(options = {}) {
     });
   });
 
-  await new Promise((resolve) => {
-    server.listen(port, '0.0.0.0', resolve);
-  });
-
-  const address = server.address();
-  const boundPort = typeof address === 'object' && address ? address.port : port;
-  const pages = hostPages(boundPort);
+  await listen(server, port);
+  const boundPort = server.address().port;
+  let securePages = [];
+  if (options.https) {
+    const certificate = ensureDevCertificate(
+      path.join(ROOT, 'relay', 'dev-certs'),
+      ipv4Hosts(),
+    );
+    httpsServer = https.createServer(
+      {key: certificate.key, cert: certificate.cert},
+      serveStatic,
+    );
+    httpsServer.on('upgrade', acceptUpgrade);
+    await listen(httpsServer, options.httpsPort ?? 8788);
+    securePages = hostPages(httpsServer.address().port, 'https');
+  }
+  const pages = hostPages(boundPort, 'http');
   return {
     port: boundPort,
     url: `ws://127.0.0.1:${boundPort}`,
     page: `http://127.0.0.1:${boundPort}/`,
     pages,
+    securePages,
     close: () =>
       new Promise((resolve, reject) => {
         wss.close();
-        server.close((error) => (error ? reject(error) : resolve()));
+        server.close((error) => {
+          if (error) {
+            reject(error);
+            return;
+          }
+          if (!httpsServer) {
+            resolve();
+            return;
+          }
+          httpsServer.close((httpsError) => (httpsError ? reject(httpsError) : resolve()));
+        });
       }),
   };
+}
+
+function listen(server, port) {
+  return new Promise((resolve, reject) => {
+    server.once('error', reject);
+    server.listen(port, '0.0.0.0', resolve);
+  });
 }
 
 function deliver(result, selfId, sockets) {
@@ -155,7 +192,7 @@ function serveStatic(request, response) {
 }
 
 const isDirectRun = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
-export function hostPages(port) {
+export function ipv4Hosts() {
   const hosts = new Set(['127.0.0.1']);
   let interfaces = {};
   try {
@@ -165,19 +202,35 @@ export function hostPages(port) {
   }
   for (const entries of Object.values(interfaces)) {
     for (const entry of entries ?? []) {
-      if (entry.family === 'IPv4' && !entry.internal) {
+      const family = entry.family === 4 ? 'IPv4' : entry.family;
+      if (family === 'IPv4' && !entry.internal) {
         hosts.add(entry.address);
       }
     }
   }
-  return [...hosts].map((host) => ({
-    page: `http://${host}:${port}/`,
-    socket: `ws://${host}:${port}`,
+  return [...hosts];
+}
+
+export function hostPages(port, protocol) {
+  const socketProtocol = protocol === 'https' ? 'wss' : 'ws';
+  return ipv4Hosts().map((host) => ({
+    page: `${protocol}://${host}:${port}/`,
+    socket: `${socketProtocol}://${host}:${port}`,
   }));
 }
 
 if (isDirectRun) {
-  startRelay().then((relay) => {
-    console.log(JSON.stringify({service: 'local-relay', event: 'listening', pages: relay.pages}));
+  startRelay({https: true}).then((relay) => {
+    console.log('Terminal TV stays on ws://127.0.0.1:8787');
+    console.log('iPhone camera page:');
+    for (const page of relay.securePages) {
+      if (!page.page.includes('127.0.0.1')) {
+        console.log(page.page);
+      }
+    }
+    console.log('Safari will say the certificate is not trusted. Tap Show Details, visit the website, then Join.');
+  }).catch((error) => {
+    console.error(error instanceof Error ? error.message : error);
+    process.exitCode = 1;
   });
 }

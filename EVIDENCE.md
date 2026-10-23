@@ -58,14 +58,32 @@ Result: **18 passed, 0 failed.**
 
 `scripts/tv-round.test.mjs` starts the local relay, joins a phone, and scores with `src/game/reducer.ts`. A matching A advances the terminal to B and sets the score to 1. The same event id is rejected. A new event id that repeats A does not raise the score, because the target is already B.
 
+## Phone camera round
+
+On October 21, one iPhone Safari session joined the local HTTPS relay. Pairing code `RV2SAU`. The terminal TV, using the same reducer as the Vega app, reached **5/5**.
+
+Accepted predictions in that round, in order:
+
+| Target | Accepted result |
+| --- | --- |
+| A | Match on the first accepted prediction. Score 1. |
+| B | Match on the first accepted prediction. Score 2. |
+| L | One mismatch, then a match. Score 3. |
+| V | 19 mismatches, then a match. Score 4. |
+| Y | One mismatch, then a match. Score 5. |
+
+A mismatch here means the phone held a different letter steady enough to pass the stability gate. The terminal does not record which letter that was. This is one round, not a recognition-rate measurement.
+
+The terminal printed `Round complete` twice because another prediction arrived after the score was already 5. The score stayed 5. `Could not reach ws://127.0.0.1:8787` appeared when the relay process was stopped after the round.
+
 ## Not verified
 
 | Check | State |
 | --- | --- |
 | Vega package build | Debug build succeeded. See below. |
 | Vega simulator D-pad walk | Blocked. The virtual device did not boot. See below. |
-| Physical camera / MediaPipe on a phone | Not run |
-| Measured recognition accuracy | None. Do not invent one. |
+| Physical camera / MediaPipe on a phone | One iPhone Safari round on October 21. All five letters scored. See above. |
+| Measured recognition accuracy | Not measured. One round is recorded above. Do not turn it into a rate. |
 | AWS deployment | Not deployed |
 | Git push | Pushed to `origin/main` on `matiyasmetek18-sketch/sign-together`. |
 

@@ -22,4 +22,4 @@ The global Web Crypto `crypto.randomUUID()` exists in Node 24. `crypto.randomInt
 
 MediaPipe's hand model and WASM are loaded by the phone from public CDNs. That is model download traffic, not an upload of camera frames. A machine without network access cannot start detection even though inference itself is local.
 
-No physical camera run has been recorded, so there is no accuracy percentage to report.
+One iPhone Safari round on October 21 scored 5/5 through the local HTTPS relay. V took 19 accepted mismatches before a match. That session is recorded in EVIDENCE.md and is not an accuracy percentage.

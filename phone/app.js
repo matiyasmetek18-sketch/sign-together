@@ -26,7 +26,9 @@ if (params.get('code')) {
 }
 
 joinButton.addEventListener('click', () => {
-  join(codeInput.value.trim().toUpperCase());
+  const cameraPromise = beginCamera();
+  cameraPromise.catch((error) => setStatus(cameraMessage(error), true));
+  join(codeInput.value.trim().toUpperCase(), cameraPromise);
 });
 
 for (const button of document.querySelectorAll('[data-test-letter]')) {
@@ -40,7 +42,19 @@ for (const button of document.querySelectorAll('[data-test-letter]')) {
   });
 }
 
-function join(code) {
+function beginCamera() {
+  if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) {
+    const error = new Error('insecure');
+    error.name = 'SecurityError';
+    return Promise.reject(error);
+  }
+  return navigator.mediaDevices.getUserMedia({
+    video: {facingMode: 'user', width: {ideal: 640}, height: {ideal: 480}},
+    audio: false,
+  });
+}
+
+function join(code, cameraPromise) {
   if (!/^[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]{6}$/.test(code)) {
     setStatus('Enter the 6-character code from the TV.', true);
     return;
@@ -55,7 +69,7 @@ function join(code) {
     if (message.type === 'session.ready') {
       joinToken = message.joinToken ?? joinToken;
       setStatus('Connected. Starting the camera…', false, true);
-      startCamera();
+      startCamera(cameraPromise);
     } else if (message.type === 'error') {
       setStatus(friendlyError(message.code), true);
     } else if (message.type === 'peer.disconnected') {
@@ -69,15 +83,12 @@ function join(code) {
   });
 }
 
-async function startCamera() {
+async function startCamera(cameraPromise = beginCamera()) {
   if (cameraOn) {
     return;
   }
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: {facingMode: 'user', width: {ideal: 640}, height: {ideal: 480}},
-      audio: false,
-    });
+    const stream = await cameraPromise;
     video.srcObject = stream;
     await video.play();
     cameraOn = true;
@@ -191,5 +202,8 @@ function cameraMessage(error) {
   if (name === 'NotReadableError') {
     return 'The camera is in use by another app.';
   }
-  return 'The camera could not start. Open this page from the local relay on your phone.';
+  if (name === 'SecurityError' || !window.isSecureContext) {
+    return 'iPhone Safari blocks the camera on http. Use the https address printed by the relay. Tap Show Details, visit the website, then Join again.';
+  }
+  return 'The camera could not start. Use the https address from the relay, then allow the camera.';
 }

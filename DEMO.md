@@ -1,7 +1,5 @@
 # Demo
 
-Do not publish the repository or submit the hackathon entry until that is explicitly approved.
-
 ## Live round on this Mac
 
 ```sh
@@ -9,7 +7,7 @@ npm run relay
 npm run tv
 ```
 
-Open the http address the relay prints. Use the network address when the phone is not the Mac. Enter the code from the terminal. Allow the camera, or open "No camera? Send a test letter" and send the letter currently shown.
+Open the https address the relay prints. Use the network address when the phone is not the Mac. iPhone Safari blocks the camera on http. When Safari warns about the certificate, tap Show Details, then visit the website. Enter the code from the terminal and allow the camera. If the camera cannot be used, open "No camera? Send a test letter" and send the letter currently shown.
 
 The terminal advances as soon as a letter matches. The Fire TV app waits about one second so the correct answer can be read.
 
@@ -19,7 +17,7 @@ The terminal advances as soon as a letter matches. The Fire TV app waits about o
 2. Show the code and the phone joining.
 3. Make or send the letter on screen. Point out that the score changes only when it matches.
 4. Send the same result again and show that the score does not change.
-5. Finish or stop on a wrong letter. Say camera accuracy has not been measured, and AWS is prepared but not deployed.
+5. Finish the round. Say one iPhone session scored 5/5 and V took many tries. That is one session, not a measured accuracy rate. AWS is prepared and not deployed.
 
 ## If the Vega simulator is available
 

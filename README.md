@@ -26,7 +26,7 @@ Supported static letters: **A, B, L, V, Y**.
 | V | Index and middle extended and spread, other fingers closed |
 | Y | Thumb and pinky extended, other fingers closed |
 
-J and Z are excluded because they require motion. Recognition is a geometric comparison of MediaPipe landmarks, not a trained translator. Ambiguous shapes are rejected. Accuracy on real cameras has not been measured yet.
+J and Z are excluded because they require motion. Recognition is a geometric comparison of MediaPipe landmarks, not a trained translator. Ambiguous shapes are rejected. One iPhone round scored 5/5. V took many tries in that round. That session is not a measured accuracy rate.
 
 ## Run the local demo
 
@@ -38,7 +38,7 @@ npm run relay
 npm run tv
 ```
 
-`npm run relay` prints an http address for this Mac and one for every local network address. Open that page on the phone and enter the code printed by `npm run tv`.
+`npm run relay` prints an https address for a phone. iPhone Safari blocks the camera on http. Open the https address, tap Show Details, visit the website, then enter the code printed by `npm run tv`.
 
 `npm run tv` is a terminal stand-in that uses the same scoring code as the Fire TV app. The Vega package is still the television app. The virtual device did not boot on this Mac, so the terminal is the way to play a live round until a Fire TV or a working simulator is available.
 
